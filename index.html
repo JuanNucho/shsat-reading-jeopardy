@@ -58,7 +58,7 @@ h1 {
     cursor:default;
 }
 
-.dailyDouble {
+.dailyReveal {
     background:gold !important;
     color:black !important;
     font-weight:bold;
@@ -141,6 +141,12 @@ button {
 
 let score = 0;
 
+/* Hidden Daily Double Location */
+let dailyDouble = {
+    category: 2,
+    points: 500
+};
+
 const categories = [
 "Main Idea",
 "Best Evidence",
@@ -152,14 +158,13 @@ const dollarValues = [100,200,300,400,500];
 
 const questions = [];
 
-/* ===== BUILD QUESTIONS ===== */
-
 function addQuestion(category, points, title, text, choices, correct, explanation){
 questions.push({category, points, title, text, choices, correct, explanation});
 }
 
-/* MAIN IDEA */
+/* ===== QUESTIONS ===== */
 
+/* MAIN IDEA */
 addQuestion(0,100,"Main Idea $100",
 "Urban gardens improve health, reduce food insecurity, and strengthen neighborhoods.",
 ["Gardens are expensive","Urban gardens provide multiple benefits","Cities are crowded","Food insecurity is rare"],
@@ -186,7 +191,6 @@ addQuestion(0,500,"Main Idea $500",
 2,"Includes condition and balance.");
 
 /* BEST EVIDENCE */
-
 addQuestion(1,100,"Evidence $100",
 "Author claims exercise improves mental health.",
 ["Gyms are popular","Studies show reduced anxiety","Exercise is hard","People enjoy sports"],
@@ -213,7 +217,6 @@ addQuestion(1,500,"Evidence $500",
 1,"Strongest support.");
 
 /* TRAP DETECTOR */
-
 addQuestion(2,100,"Trap $100",
 "Which is extreme language?",
 ["Sometimes improves","Always improves","Often helps","May improve"],
@@ -240,7 +243,6 @@ addQuestion(2,500,"Trap $500",
 1,"Exaggeration trap.");
 
 /* AUTHOR PURPOSE */
-
 addQuestion(3,100,"Purpose $100",
 "Explains volcano formation.",
 ["Persuade","Inform","Entertain","Criticize"],
@@ -283,12 +285,6 @@ let q=questions.find(q=>q.category===i && q.points===points);
 let tile=document.createElement("div");
 tile.className="tile";
 tile.innerText="$"+points;
-
-if(points===500 && i===2){
-tile.classList.add("dailyDouble");
-tile.innerText="Daily Double!";
-}
-
 tile.onclick=()=>openQuestion(q,tile);
 board.appendChild(tile);
 });
@@ -297,6 +293,7 @@ board.appendChild(tile);
 /* ===== GAME LOGIC ===== */
 
 function openQuestion(q,tile){
+
 if(tile.classList.contains("used")) return;
 tile.classList.add("used");
 
@@ -306,6 +303,12 @@ document.getElementById("questionText").innerText=q.text;
 
 let choicesDiv=document.getElementById("choices");
 choicesDiv.innerHTML="";
+
+/* DAILY DOUBLE REVEAL */
+if(q.category===dailyDouble.category && q.points===dailyDouble.points){
+    updateHost("🎉 DAILY DOUBLE!!! You control the board!");
+    tile.classList.add("dailyReveal");
+}
 
 q.choices.forEach((choice,index)=>{
 let div=document.createElement("div");
@@ -338,9 +341,5 @@ document.getElementById("host").innerText=text;
 }
 
 </script>
-</body>
-</html>
-</script>
-
 </body>
 </html>

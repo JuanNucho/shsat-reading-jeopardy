@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SHSAT Reading Jeopardy – Main Idea & Evidence</title>
+
+<style>
+body {
+    margin:0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg,#0b3d91,#002855);
+    color:white;
+    text-align:center;
+}
+
+h1 {
+    margin-top:20px;
+    font-size:40px;
+}
+
+#board {
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:10px;
+    padding:30px;
+    max-width:1100px;
+    margin:auto;
+}
+
+.category {
+    background:#001f4d;
+    padding:15px;
+    font-weight:bold;
+    font-size:18px;
+}
+
+.tile {
+    background:#0057b7;
+    padding:30px 10px;
+    font-size:28px;
+    cursor:pointer;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+.tile:hover {
+    background:#007bff;
+    transform:scale(1.05);
+}
+
+.used {
+    background:#1a1a1a !important;
+    cursor:default;
+}
+
+#modal {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+#modalContent {
+    background:white;
+    color:#1f2d3d;
+    width:80%;
+    max-width:900px;
+    padding:40px;
+    border-radius:12px;
+    text-align:left;
+}
+
+#modal h2 {
+    margin-top:0;
+}
+
+.choice {
+    background:#e8f1ff;
+    padding:12px;
+    margin:10px 0;
+    border-radius:6px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.choice:hover {
+    background:#cce0ff;
+}
+
+.correct {
+    background:#c8f7c5 !important;
+}
+
+.incorrect {
+    background:#ffcccc !important;
+}
+
+#host {
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#111;
+    padding:15px;
+    font-size:18px;
+}
+
+button {
+    padding:10px 20px;
+    margin-top:15px;
+    border:none;
+    background:#0b3d91;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📘 SHSAT Reading Jeopardy</h1>
+<p>Main Idea & Evidence Challenge</p>
+
+<div id="board"></div>
+
+<div id="modal">
+    <div id="modalContent">
+        <h2 id="questionTitle"></h2>
+        <p id="questionText"></p>
+        <div id="choices"></div>
+        <button onclick="closeModal()">Return to Board</button>
+    </div>
+</div>
+
+<div id="host">
+🎤 Host: Welcome scholars! Select a category and show us your evidence-based thinking!
+</div>
+
+<script>
+
+const categories = [
+"Main Idea",
+"Best Evidence",
+"Trap Detector",
+"Author’s Purpose"
+];
+
+const questions = [
+{
+category:0,
+points:100,
+title:"Main Idea – $100",
+text:"A passage describes how urban gardens improve community health, reduce food insecurity, and strengthen neighborhoods. What is the main idea?",
+choices:[
+"Urban gardens are expensive.",
+"Urban gardens provide multiple community benefits.",
+"Cities are overcrowded.",
+"Food insecurity only affects adults."
+],
+correct:1,
+explanation:"The passage focuses on multiple positive impacts — that’s the core idea."
+},
+{
+category:0,
+points:200,
+title:"Main Idea – $200",
+text:"A passage compares traditional books and e-books but concludes both offer unique advantages. What is the main idea?",
+choices:[
+"E-books are better.",
+"Traditional books are outdated.",
+"Both formats have advantages.",
+"Reading is declining."
+],
+correct:2,
+explanation:"Balanced comparison = both have strengths."
+},
+{
+category:1,
+points:100,
+title:"Best Evidence – $100",
+text:"The author claims renewable energy reduces pollution. Which sentence best supports this?",
+choices:[
+"Renewable energy is popular.",
+"Solar panels reduce carbon emissions.",
+"Wind turbines are tall.",
+"Energy is important."
+],
+correct:1,
+explanation:"That sentence directly supports pollution reduction."
+},
+{
+category:1,
+points:200,
+title:"Best Evidence – $200",
+text:"The passage argues exercise improves mental health. Which is best evidence?",
+choices:[
+"Exercise is difficult.",
+"People enjoy sports.",
+"Studies show exercise reduces anxiety.",
+"Gyms are expensive."
+],
+correct:2,
+explanation:"Scientific study = strongest support."
+},
+{
+category:2,
+points:100,
+title:"Trap Detector – $100",
+text:"Which answer is a trap due to extreme language?",
+choices:[
+"Sometimes improves learning.",
+"Always improves learning.",
+"Can improve learning.",
+"Often improves learning."
+],
+correct:1,
+explanation:"‘Always’ is extreme."
+},
+{
+category:2,
+points:200,
+title:"Trap Detector – $200",
+text:"The passage says the character left because he was angry and confused. Which is half-true?",
+choices:[
+"He was angry.",
+"He was angry and confused.",
+"He was confused.",
+"He left."
+],
+correct:0,
+explanation:"It leaves out ‘confused.’"
+},
+{
+category:3,
+points:100,
+title:"Author’s Purpose – $100",
+text:"A passage explains how volcanoes form using facts and diagrams. Purpose?",
+choices:[
+"Persuade",
+"Entertain",
+"Inform",
+"Criticize"
+],
+correct:2,
+explanation:"Informational tone."
+},
+{
+category:3,
+points:200,
+title:"Author’s Purpose – $200",
+text:"A writer argues schools should start later and gives reasons why. Purpose?",
+choices:[
+"Entertain",
+"Persuade",
+"Describe",
+"Explain volcanoes"
+],
+correct:1,
+explanation:"Argument = persuasion."
+}
+];
+
+let board = document.getElementById("board");
+
+categories.forEach((cat,i)=>{
+let div=document.createElement("div");
+div.className="category";
+div.innerText=cat;
+board.appendChild(div);
+});
+
+for(let row=0;row<2;row++){
+categories.forEach((cat,i)=>{
+let q=questions.find(q=>q.category===i && q.points===(row===0?100:200));
+let tile=document.createElement("div");
+tile.className="tile";
+tile.innerText="$"+q.points;
+tile.onclick=()=>openQuestion(q,tile);
+board.appendChild(tile);
+});
+}
+
+function openQuestion(q,tile){
+if(tile.classList.contains("used")) return;
+tile.classList.add("used");
+
+document.getElementById("modal").style.display="flex";
+document.getElementById("questionTitle").innerText=q.title;
+document.getElementById("questionText").innerText=q.text;
+
+let choicesDiv=document.getElementById("choices");
+choicesDiv.innerHTML="";
+
+q.choices.forEach((choice,index)=>{
+let div=document.createElement("div");
+div.className="choice";
+div.innerText=choice;
+div.onclick=()=>{
+if(index===q.correct){
+div.classList.add("correct");
+updateHost("🎤 Excellent! "+q.explanation);
+}else{
+div.classList.add("incorrect");
+updateHost("🎤 Not quite. "+q.explanation);
+}
+};
+choicesDiv.appendChild(div);
+});
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+updateHost("🎤 Choose your next category wisely!");
+}
+
+function updateHost(text){
+document.getElementById("host").innerText=text;
+}
+
+</script>
+
+</body>
+</html>

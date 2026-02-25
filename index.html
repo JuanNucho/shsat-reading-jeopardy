@@ -2,33 +2,38 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SHSAT Reading Jeopardy – Main Idea & Evidence</title>
+<title>SHSAT Reading Jeopardy – Tournament Edition</title>
 
 <style>
 body {
     margin:0;
     font-family: "Segoe UI", Arial, sans-serif;
-    background: linear-gradient(135deg,#0b3d91,#002855);
+    background: linear-gradient(135deg,#001f4d,#0b3d91);
     color:white;
     text-align:center;
 }
 
 h1 {
     margin-top:20px;
-    font-size:40px;
+    font-size:42px;
+}
+
+#scoreBoard {
+    font-size:22px;
+    margin-bottom:10px;
 }
 
 #board {
     display:grid;
     grid-template-columns: repeat(4,1fr);
     gap:10px;
-    padding:30px;
-    max-width:1100px;
+    padding:20px;
+    max-width:1200px;
     margin:auto;
 }
 
 .category {
-    background:#001f4d;
+    background:#001433;
     padding:15px;
     font-weight:bold;
     font-size:18px;
@@ -44,13 +49,19 @@ h1 {
 }
 
 .tile:hover {
-    background:#007bff;
+    background:#0080ff;
     transform:scale(1.05);
 }
 
 .used {
-    background:#1a1a1a !important;
+    background:#222 !important;
     cursor:default;
+}
+
+.dailyDouble {
+    background:gold !important;
+    color:black !important;
+    font-weight:bold;
 }
 
 #modal {
@@ -68,15 +79,11 @@ h1 {
 #modalContent {
     background:white;
     color:#1f2d3d;
-    width:80%;
+    width:85%;
     max-width:900px;
     padding:40px;
     border-radius:12px;
     text-align:left;
-}
-
-#modal h2 {
-    margin-top:0;
 }
 
 .choice {
@@ -88,17 +95,10 @@ h1 {
     transition:0.2s;
 }
 
-.choice:hover {
-    background:#cce0ff;
-}
+.choice:hover { background:#cce0ff; }
 
-.correct {
-    background:#c8f7c5 !important;
-}
-
-.incorrect {
-    background:#ffcccc !important;
-}
+.correct { background:#c8f7c5 !important; }
+.incorrect { background:#ffcccc !important; }
 
 #host {
     position:fixed;
@@ -108,10 +108,8 @@ h1 {
     padding:15px;
     font-size:18px;
 }
-
 button {
     padding:10px 20px;
-    margin-top:15px;
     border:none;
     background:#0b3d91;
     color:white;
@@ -124,24 +122,24 @@ button {
 <body>
 
 <h1>📘 SHSAT Reading Jeopardy</h1>
-<p>Main Idea & Evidence Challenge</p>
+<div id="scoreBoard">Score: $<span id="score">0</span></div>
 
 <div id="board"></div>
 
 <div id="modal">
-    <div id="modalContent">
-        <h2 id="questionTitle"></h2>
-        <p id="questionText"></p>
-        <div id="choices"></div>
-        <button onclick="closeModal()">Return to Board</button>
-    </div>
+<div id="modalContent">
+<h2 id="questionTitle"></h2>
+<p id="questionText"></p>
+<div id="choices"></div>
+<button onclick="closeModal()">Return to Board</button>
+</div>
 </div>
 
-<div id="host">
-🎤 Host: Welcome scholars! Select a category and show us your evidence-based thinking!
-</div>
+<div id="host">🎤 Host: Welcome to the SHSAT Reading Championship!</div>
 
 <script>
+
+let score = 0;
 
 const categories = [
 "Main Idea",
@@ -150,140 +148,153 @@ const categories = [
 "Author’s Purpose"
 ];
 
-const questions = [
-{
-category:0,
-points:100,
-title:"Main Idea – $100",
-text:"A passage describes how urban gardens improve community health, reduce food insecurity, and strengthen neighborhoods. What is the main idea?",
-choices:[
-"Urban gardens are expensive.",
-"Urban gardens provide multiple community benefits.",
-"Cities are overcrowded.",
-"Food insecurity only affects adults."
-],
-correct:1,
-explanation:"The passage focuses on multiple positive impacts — that’s the core idea."
-},
-{
-category:0,
-points:200,
-title:"Main Idea – $200",
-text:"A passage compares traditional books and e-books but concludes both offer unique advantages. What is the main idea?",
-choices:[
-"E-books are better.",
-"Traditional books are outdated.",
-"Both formats have advantages.",
-"Reading is declining."
-],
-correct:2,
-explanation:"Balanced comparison = both have strengths."
-},
-{
-category:1,
-points:100,
-title:"Best Evidence – $100",
-text:"The author claims renewable energy reduces pollution. Which sentence best supports this?",
-choices:[
-"Renewable energy is popular.",
-"Solar panels reduce carbon emissions.",
-"Wind turbines are tall.",
-"Energy is important."
-],
-correct:1,
-explanation:"That sentence directly supports pollution reduction."
-},
-{
-category:1,
-points:200,
-title:"Best Evidence – $200",
-text:"The passage argues exercise improves mental health. Which is best evidence?",
-choices:[
-"Exercise is difficult.",
-"People enjoy sports.",
-"Studies show exercise reduces anxiety.",
-"Gyms are expensive."
-],
-correct:2,
-explanation:"Scientific study = strongest support."
-},
-{
-category:2,
-points:100,
-title:"Trap Detector – $100",
-text:"Which answer is a trap due to extreme language?",
-choices:[
-"Sometimes improves learning.",
-"Always improves learning.",
-"Can improve learning.",
-"Often improves learning."
-],
-correct:1,
-explanation:"‘Always’ is extreme."
-},
-{
-category:2,
-points:200,
-title:"Trap Detector – $200",
-text:"The passage says the character left because he was angry and confused. Which is half-true?",
-choices:[
-"He was angry.",
-"He was angry and confused.",
-"He was confused.",
-"He left."
-],
-correct:0,
-explanation:"It leaves out ‘confused.’"
-},
-{
-category:3,
-points:100,
-title:"Author’s Purpose – $100",
-text:"A passage explains how volcanoes form using facts and diagrams. Purpose?",
-choices:[
-"Persuade",
-"Entertain",
-"Inform",
-"Criticize"
-],
-correct:2,
-explanation:"Informational tone."
-},
-{
-category:3,
-points:200,
-title:"Author’s Purpose – $200",
-text:"A writer argues schools should start later and gives reasons why. Purpose?",
-choices:[
-"Entertain",
-"Persuade",
-"Describe",
-"Explain volcanoes"
-],
-correct:1,
-explanation:"Argument = persuasion."
+const dollarValues = [100,200,300,400,500];
+
+const questions = [];
+
+/* ===== BUILD QUESTIONS ===== */
+
+function addQuestion(category, points, title, text, choices, correct, explanation){
+questions.push({category, points, title, text, choices, correct, explanation});
 }
-];
 
-let board = document.getElementById("board");
+/* MAIN IDEA */
 
-categories.forEach((cat,i)=>{
+addQuestion(0,100,"Main Idea $100",
+"Urban gardens improve health, reduce food insecurity, and strengthen neighborhoods.",
+["Gardens are expensive","Urban gardens provide multiple benefits","Cities are crowded","Food insecurity is rare"],
+1,"Balanced summary of benefits.");
+
+addQuestion(0,200,"Main Idea $200",
+"A passage compares print and digital books, explaining advantages of both.",
+["E-books are better","Both formats have strengths","Books are outdated","Reading is declining"],
+1,"Balanced comparison.");
+
+addQuestion(0,300,"Main Idea $300",
+"The author discusses challenges and solutions for renewable energy adoption.",
+["Energy is difficult","Renewables face obstacles but offer solutions","Fossil fuels are better","Solar panels are popular"],
+1,"Includes challenge + solution.");
+
+addQuestion(0,400,"Main Idea $400",
+"A scientist explains how climate change affects oceans and wildlife ecosystems.",
+["Oceans are large","Climate change impacts marine ecosystems","Wildlife is interesting","Scientists study oceans"],
+1,"Central theme is impact.");
+
+addQuestion(0,500,"Main Idea $500",
+"The passage argues technology can improve learning but must be used thoughtfully.",
+["Technology is harmful","Technology always improves learning","Technology helps when used wisely","Schools should ban devices"],
+2,"Includes condition and balance.");
+
+/* BEST EVIDENCE */
+
+addQuestion(1,100,"Evidence $100",
+"Author claims exercise improves mental health.",
+["Gyms are popular","Studies show reduced anxiety","Exercise is hard","People enjoy sports"],
+1,"Direct research support.");
+
+addQuestion(1,200,"Evidence $200",
+"Claim: Renewable energy reduces pollution.",
+["Solar panels reduce emissions","Windmills are tall","Energy costs money","Energy is important"],
+0,"Direct support.");
+
+addQuestion(1,300,"Evidence $300",
+"Claim: Reading fiction builds empathy.",
+["Stories are fun","Research links fiction to empathy","Books are popular","Libraries exist"],
+1,"Scientific support.");
+
+addQuestion(1,400,"Evidence $400",
+"Claim: Urban parks improve community well-being.",
+["Parks are green","Community surveys show improved mood","Cities are busy","Trees are tall"],
+1,"Evidence through data.");
+
+addQuestion(1,500,"Evidence $500",
+"Claim: Sleep improves academic performance.",
+["Students like sleep","Studies show higher grades with sleep","Sleep feels good","Schools start early"],
+1,"Strongest support.");
+
+/* TRAP DETECTOR */
+
+addQuestion(2,100,"Trap $100",
+"Which is extreme language?",
+["Sometimes improves","Always improves","Often helps","May improve"],
+1,"Always = extreme.");
+
+addQuestion(2,200,"Trap $200",
+"Character left because angry and confused. Half-true?",
+["He was angry","He was angry and confused","He was confused","He left"],
+0,"Leaves out confused.");
+
+addQuestion(2,300,"Trap $300",
+"Question asks cost of notebooks only but includes pencil price. Trap?",
+["Include pencil","Ignore pencil","Add everything","Guess"],
+1,"Ignore extra info.");
+
+addQuestion(2,400,"Trap $400",
+"Which answer overgeneralizes?",
+["Some students struggle","All students struggle","Many students struggle","Several struggle"],
+1,"All = overgeneralized.");
+
+addQuestion(2,500,"Trap $500",
+"Which answer misrepresents author tone?",
+["Balanced view","Extreme claim not stated","Qualified statement","Moderate summary"],
+1,"Exaggeration trap.");
+
+/* AUTHOR PURPOSE */
+
+addQuestion(3,100,"Purpose $100",
+"Explains volcano formation.",
+["Persuade","Inform","Entertain","Criticize"],
+1,"Informational.");
+
+addQuestion(3,200,"Purpose $200",
+"Argues schools should start later.",
+["Entertain","Persuade","Describe","Narrate"],
+1,"Argument.");
+
+addQuestion(3,300,"Purpose $300",
+"Describes a historical event with facts.",
+["Inform","Convince","Entertain","Scold"],
+0,"Factual.");
+
+addQuestion(3,400,"Purpose $400",
+"Uses humor to tell a story.",
+["Inform","Persuade","Entertain","Explain"],
+2,"Humor.");
+
+addQuestion(3,500,"Purpose $500",
+"Warns readers about dangers of misinformation.",
+["Entertain","Persuade","Describe","Compare"],
+1,"Warning = persuasion.");
+
+/* ===== BUILD BOARD ===== */
+
+let board=document.getElementById("board");
+
+categories.forEach(cat=>{
 let div=document.createElement("div");
 div.className="category";
 div.innerText=cat;
 board.appendChild(div);
 });
 
-for(let row=0;row<2;row++){
+dollarValues.forEach(points=>{
 categories.forEach((cat,i)=>{
-let q=questions.find(q=>q.category===i && q.points===(row===0?100:200));
+let q=questions.find(q=>q.category===i && q.points===points);
 let tile=document.createElement("div");
 tile.className="tile";
-tile.innerText="$"+q.points;
+tile.innerText="$"+points;
+
+if(points===500 && i===2){
+tile.classList.add("dailyDouble");
+tile.innerText="Daily Double!";
+}
+
 tile.onclick=()=>openQuestion(q,tile);
 board.appendChild(tile);
 });
-}
+});
+
+/* ===== GAME LOGIC ===== */
 
 function openQuestion(q,tile){
 if(tile.classList.contains("used")) return;
@@ -300,14 +311,18 @@ q.choices.forEach((choice,index)=>{
 let div=document.createElement("div");
 div.className="choice";
 div.innerText=choice;
+
 div.onclick=()=>{
 if(index===q.correct){
 div.classList.add("correct");
+score+=q.points;
 updateHost("🎤 Excellent! "+q.explanation);
 }else{
 div.classList.add("incorrect");
+score-=q.points;
 updateHost("🎤 Not quite. "+q.explanation);
 }
+document.getElementById("score").innerText=score;
 };
 choicesDiv.appendChild(div);
 });
@@ -315,13 +330,16 @@ choicesDiv.appendChild(div);
 
 function closeModal(){
 document.getElementById("modal").style.display="none";
-updateHost("🎤 Choose your next category wisely!");
+updateHost("🎤 Select the next challenge!");
 }
 
 function updateHost(text){
 document.getElementById("host").innerText=text;
 }
 
+</script>
+</body>
+</html>
 </script>
 
 </body>
